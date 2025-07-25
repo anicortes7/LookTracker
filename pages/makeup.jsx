@@ -1,7 +1,8 @@
 import Navbar from '../components/Navbar';
 import ProductCard from '../components/ProductCard';
+import { supabase } from '../lib/supabaseClient';
 
-export default function Makeup({ products = [] }) {
+export default function Makeup({ products }) {
   return (
     <>
       <Navbar />
@@ -11,8 +12,8 @@ export default function Makeup({ products = [] }) {
           {products.length === 0 ? (
             <p>No hay productos cargados todavía.</p>
           ) : (
-            products.map(({ name, brand, category, subcategory, image }) => (
-              <div className="col-12 col-sm-6 col-md-4 mb-4" key={name}>
+            products.map(({ id, name, brand, category, subcategory, image }) => (
+              <div className="col-12 col-sm-6 col-md-4 mb-4" key={id}>
                 <ProductCard
                   name={name}
                   brand={brand}
@@ -27,4 +28,19 @@ export default function Makeup({ products = [] }) {
       </main>
     </>
   );
+}
+
+export async function getServerSideProps() {
+  const { data, error } = await supabase
+    .from('makeup') // nombre de tu tabla en Supabase
+    .select('*');
+
+  if (error) {
+    console.error(error);
+    return { props: { products: [] } };
+  }
+
+  return {
+    props: { products: data || [] },
+  };
 }

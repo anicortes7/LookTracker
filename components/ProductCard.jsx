@@ -7,6 +7,7 @@ const ProductCard = ({
   category,
   subcategory,
   image,
+  color,
 }) => {
   const [favorito, setFavorito] = useState(false);
 
@@ -35,6 +36,18 @@ const ProductCard = ({
           <p className="card-text">
             <strong>Subcategoría:</strong> {subcategory}
           </p>
+        )}
+
+        {/* Circulito color */}
+        {color && (
+          <div className="color-circle">
+            <Image
+              src={`/icons/colors/${color}.svg`}
+              alt={color}
+              width={20}
+              height={20}
+            />
+          </div>
         )}
       </div>
 
