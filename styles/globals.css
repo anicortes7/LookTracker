@@ -1,0 +1,150 @@
+/* Fuentes */
+@font-face {
+  font-family: 'TanGrandeur';
+  src: url('/fonts/tangrandeur.woff2') format('woff2');
+  font-weight: normal;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'TAN Pearl';
+  src: url('/fonts/tanpearl.woff2') format('woff2');
+  font-weight: normal;
+  font-style: normal;
+}
+
+:root {
+  --color-fondo-base: #F7F1EB;
+  --color-rosado-suave: #EDAFB8;
+  --color-peach-claro: #F7E1D7;
+  --color-verde-pastel: #CFE1CB;
+  --color-verde-medio: #9DC296;
+  --color-verde-oscuro: #324E2C;
+  --color-casi-negro: #111A0F;
+}
+
+/* Estilos base */
+body {
+  font-family: Helvetica, Arial, sans-serif;
+  background-color: var(--color-fondo-base);
+  color: var(--color-casi-negro);
+  margin: 0;
+  padding: 0;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: 'TAN Pearl', serif;
+  margin: 0;
+  padding: 0;
+}
+
+/* Navbar */
+.navbar-custom {
+  background-color: var(--color-fondo-base);
+}
+
+.navbar-brand {
+  font-family: 'TanGrandeur', serif;
+  color: var(--color-rosado-suave);
+  font-size: 1.8rem;
+}
+.navbar-brand:hover {
+  color: var(--color-verde-medio);
+  transition: color 0.3s ease;
+}
+
+.navbar-nav .nav-link {
+  font-family: 'TAN Pearl', serif;
+  color: var(--color-verde-oscuro);
+  font-weight: 500;
+  transition: color 0.3s ease;
+}
+
+.navbar-nav .nav-link:hover {
+  color: var(--color-verde-medio);
+}
+/* Stats Display */
+.stat-card {
+  background-color: var(--color-peach-claro);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  cursor: pointer;
+}
+
+.stat-card:hover {
+  transform: scale(1.05);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+}
+
+.stat-number {
+  font-family: 'TAN Pearl', serif;
+  font-size: 2rem;
+  color: var(--color-verde-oscuro);
+  margin: 0;
+}
+
+.stat-label {
+  font-family: 'TAN Pearl', serif;
+  font-size: 1rem;
+  color: var(--color-casi-negro);
+  margin: 0;
+}
+/* Product Card */
+.product-card {
+  border: none;
+  border-radius: 12px;
+  overflow: hidden;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  position: relative;
+  cursor: default;
+}
+
+.product-card:hover {
+  transform: scale(1.03);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1);
+}
+
+/* Tag categoría esquina superior derecha */
+.category-tag {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  background-color: var(--color-verde-medio);
+  color: white;
+  font-family: 'helvetica', Arial, sans-serif;
+  font-size: 1rem;
+  font-weight: 500;
+  padding: 4px 8px;
+  border-radius: 12px;
+  user-select: none;
+  z-index: 10;
+}
+
+/* Imagen */
+.product-image-container {
+  position: relative;
+  width: 100%;
+  height: auto;
+}
+
+.product-image {
+  object-fit: cover;
+}
+
+/* Botón favorito en esquina inferior derecha */
+.favorite-btn {
+  position: absolute;
+  bottom: 12px;
+  right: 12px;
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  transition: transform 0.2s ease;
+  z-index: 10;
+}
+
+.favorite-btn:hover {
+  transform: scale(1.2);
+}
+
+
