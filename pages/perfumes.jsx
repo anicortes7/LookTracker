@@ -8,6 +8,8 @@ export default function Perfumes({ perfumes }) {
   const [showModal, setShowModal] = useState(false);
 
   const handleAdd = async (newPerfume) => {
+    console.log('Insertando perfume:', newPerfume); // 👈 Log del objeto antes del insert
+
     const { data, error } = await supabase
       .from('perfumes')
       .insert([newPerfume]);
