@@ -1,16 +1,23 @@
 import { useState } from 'react';
 import Navbar from '../components/Navbar';
-import AddWishlistModal from '../components/AddWishlistModal'; // ⬅️ Importamos el modal
+import AddWishlistModal from '../components/AddWishlistModal';
 import { supabase } from '../lib/supabaseClient';
 
 export default function Wishlist({ wishlistItems }) {
-  const [items, setItems] = useState(wishlistItems);
+  // Normalizamos para que tags, notes, main_accords no sean null
+  const normalizedItems = wishlistItems.map(item => ({
+    ...item,
+    tags: item.tags ?? [],
+    notes: item.notes ?? [],
+    main_accords: item.main_accords ?? [],
+  }));
+
+  const [items, setItems] = useState(normalizedItems);
   const [showModal, setShowModal] = useState(false);
 
   const handleMoveToCollection = async (item) => {
     console.log('Mover a colección:', item);
-
-    // Más adelante implementamos la lógica de mover
+    // Implementar luego
   };
 
   const handleAddToWishlist = async (newItem) => {
@@ -23,7 +30,15 @@ export default function Wishlist({ wishlistItems }) {
       return;
     }
 
-    setItems((prev) => [...prev, data[0]]);
+    // Normalizamos también el nuevo item
+    const added = {
+      ...data[0],
+      tags: data[0].tags ?? [],
+      notes: data[0].notes ?? [],
+      main_accords: data[0].main_accords ?? [],
+    };
+
+    setItems((prev) => [...prev, added]);
   };
 
   return (
@@ -55,9 +70,9 @@ export default function Wishlist({ wishlistItems }) {
                       {item.size && <>Tamaño: {item.size}<br /></>}
                       {item.color && <>Color: {item.color}<br /></>}
                     </p>
-                    {item.tags && item.tags.length > 0 && (
+                    {(item.tags ?? []).length > 0 && (
                       <div className="mb-2">
-                        {item.tags.map((tag) => (
+                        {(item.tags ?? []).map((tag) => (
                           <span key={tag} className="badge bg-warning text-dark me-1">{tag}</span>
                         ))}
                       </div>
@@ -86,7 +101,6 @@ export default function Wishlist({ wishlistItems }) {
   );
 }
 
-// Fetch inicial desde Supabase
 export async function getServerSideProps() {
   const { data, error } = await supabase
     .from('wishlist')
@@ -97,9 +111,17 @@ export async function getServerSideProps() {
     return { props: { wishlistItems: [] } };
   }
 
+  // Normalizo para evitar null en frontend
+  const wishlistItems = (data ?? []).map(item => ({
+    ...item,
+    tags: item.tags ?? [],
+    notes: item.notes ?? [],
+    main_accords: item.main_accords ?? [],
+  }));
+
   return {
     props: {
-      wishlistItems: data || [],
+      wishlistItems,
     },
   };
 }
