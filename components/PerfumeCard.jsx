@@ -28,7 +28,7 @@ const PerfumeCard = ({
 
   return (
     <div className={`card perfume-card shadow-sm position-relative ${isDecant ? 'decant-bg' : ''}`}>
-      <div className="type-tag">{displayType}</div>
+      <div className="category-tag">{displayType}</div>
       
       <div className="card-body pb-4">
         <h5 className="card-title">{name}</h5>

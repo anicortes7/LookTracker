@@ -67,10 +67,9 @@ export default function AddPerfumeModal({ onClose, onAdd, existingNotes = [], ex
   };
 
   return (
-    <div className="modal show d-block" tabIndex="-1" style={{ backgroundColor: 'rgba(0,0,0,0.5)' }}>
+    <div className="modal show d-block" tabIndex="-1">
       <div className="modal-dialog">
         <div className="modal-content">
-
           <div className="modal-header">
             <h5 className="modal-title">Agregar Perfume</h5>
             <button type="button" className="close-modal-btn" onClick={onClose}>
