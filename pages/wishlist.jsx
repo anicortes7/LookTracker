@@ -1,11 +1,20 @@
 import { useState } from 'react';
 import Navbar from '../components/Navbar';
 import AddWishlistModal from '../components/AddWishlistModal';
-import WishlistCard from '../components/WishlistCard'; // Importamos el nuevo componente
+import WishlistCard from '../components/WishlistCard'; // Importa el nuevo componente
 import { supabase } from '../lib/supabaseClient';
 
 export default function Wishlist({ wishlistItems }) {
-  const [items, setItems] = useState(wishlistItems);
+  // Sanear arrays en cada item para evitar null en tags, notes, main_accords
+  const sanitizeItems = (items) =>
+    items.map(item => ({
+      ...item,
+      tags: Array.isArray(item.tags) ? item.tags : [],
+      notes: Array.isArray(item.notes) ? item.notes : [],
+      main_accords: Array.isArray(item.main_accords) ? item.main_accords : [],
+    }));
+
+  const [items, setItems] = useState(sanitizeItems(wishlistItems));
   const [showModal, setShowModal] = useState(false);
 
   const handleMoveToCollection = async (item) => {
@@ -62,7 +71,9 @@ export default function Wishlist({ wishlistItems }) {
       return;
     }
 
-    setItems((prev) => [...prev, data[0]]);
+    // Sanea el nuevo item insertado también
+    const sanitizedNewItem = sanitizeItems(data)[0];
+    setItems((prev) => [...prev, sanitizedNewItem]);
   };
 
   return (
@@ -71,10 +82,7 @@ export default function Wishlist({ wishlistItems }) {
       <main className="container my-5">
         <div className="d-flex justify-content-between align-items-center mb-4">
           <h1 className="title-looktracker mb-0">Wishlist</h1>
-          <button
-            className="btn btn-primary"
-            onClick={() => setShowModal(true)}
-          >
+          <button className="btn btn-primary" onClick={() => setShowModal(true)}>
             + Agregar a wishlist
           </button>
         </div>
@@ -102,6 +110,7 @@ export default function Wishlist({ wishlistItems }) {
   );
 }
 
+// Sanear datos en el servidor también, para no mandar null
 export async function getServerSideProps() {
   const { data, error } = await supabase
     .from('wishlist')
@@ -112,9 +121,16 @@ export async function getServerSideProps() {
     return { props: { wishlistItems: [] } };
   }
 
+  const cleanData = (data || []).map(item => ({
+    ...item,
+    tags: Array.isArray(item.tags) ? item.tags : [],
+    notes: Array.isArray(item.notes) ? item.notes : [],
+    main_accords: Array.isArray(item.main_accords) ? item.main_accords : [],
+  }));
+
   return {
     props: {
-      wishlistItems: data || [],
+      wishlistItems: cleanData,
     },
   };
 }
