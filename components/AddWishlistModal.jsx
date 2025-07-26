@@ -1,63 +1,110 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 
-export default function AddWishlistModal({ onClose, onAdd }) {
+export default function AddWishlistModal({ onClose, onAdd, existingNotes = [], existingAccords = [], existingTags = [] }) {
+  const [itemType, setItemType] = useState('');
   const [name, setName] = useState('');
   const [brand, setBrand] = useState('');
-  const [itemType, setItemType] = useState('');
 
-  // Makeup fields
-  const [category, setCategory] = useState('');
-  const [subcategory, setSubcategory] = useState('');
-
-  // Perfume fields
+  // Campos perfumes
   const [type, setType] = useState('');
   const [notes, setNotes] = useState([]);
   const [noteInput, setNoteInput] = useState('');
   const [mainAccords, setMainAccords] = useState([]);
   const [accordInput, setAccordInput] = useState('');
 
-  // Shared
+  // Campos makeup
+  const [category, setCategory] = useState('');
+  const [subcategory, setSubcategory] = useState('');
+
+  // Campos comunes
   const [tags, setTags] = useState([]);
   const [tagInput, setTagInput] = useState('');
 
+  const perfumeTypes = [
+    { label: 'Parfum', value: 'parfum' },
+    { label: 'Extrait de Parfum', value: 'extrait' },
+    { label: 'Eau de Parfum (EDP)', value: 'edp' },
+    { label: 'Eau de Toilette (EDT)', value: 'edt' },
+    { label: 'Eau de Cologne (EDC)', value: 'edc' },
+    { label: 'Body Mist', value: 'body mist' },
+  ];
+
   const addNote = () => {
     const trimmed = noteInput.trim();
-    if (trimmed && !notes.includes(trimmed)) setNotes([...notes, trimmed]);
+    if (trimmed && !notes.includes(trimmed)) {
+      setNotes([...notes, trimmed]);
+    }
     setNoteInput('');
   };
 
   const addAccord = () => {
     const trimmed = accordInput.trim();
-    if (trimmed && !mainAccords.includes(trimmed)) setMainAccords([...mainAccords, trimmed]);
+    if (trimmed && !mainAccords.includes(trimmed)) {
+      setMainAccords([...mainAccords, trimmed]);
+    }
     setAccordInput('');
   };
 
   const addTag = () => {
     const trimmed = tagInput.trim();
-    if (trimmed && !tags.includes(trimmed)) setTags([...tags, trimmed]);
+    if (trimmed && !tags.includes(trimmed)) {
+      setTags([...tags, trimmed]);
+    }
     setTagInput('');
   };
+
+  useEffect(() => {
+    setType('');
+    setNotes([]);
+    setNoteInput('');
+    setMainAccords([]);
+    setAccordInput('');
+
+    setCategory('');
+    setSubcategory('');
+  }, [itemType]);
 
   const handleSubmit = (e) => {
     e.preventDefault();
 
-    const newItem = {
+    if (!itemType) {
+      alert('Por favor selecciona un tipo de producto.');
+      return;
+    }
+
+    const baseData = {
+      item_type: itemType,
       name,
       brand,
-      item_type: itemType,
       tags,
     };
 
-    if (itemType === 'makeup') {
-      newItem.category = category;
-      newItem.subcategory = subcategory;
-    } else if (itemType === 'perfume') {
-      newItem.type = type;
-      newItem.notes = notes;
-      newItem.main_accords = mainAccords;
+    let finalData = {};
+
+    if (itemType === 'perfume') {
+      if (!type) {
+        alert('Por favor selecciona un tipo de perfume.');
+        return;
+      }
+      finalData = {
+        ...baseData,
+        type,
+        notes,
+        main_accords: mainAccords,
+      };
+    } else if (itemType === 'makeup') {
+      if (!category || !subcategory) {
+        alert('Por favor completa categoría y subcategoría para makeup.');
+        return;
+      }
+      finalData = {
+        ...baseData,
+        category,
+        subcategory,
+      };
     }
 
-    onAdd(newItem);
+    onAdd(finalData);
     onClose();
   };
 
@@ -75,6 +122,7 @@ export default function AddWishlistModal({ onClose, onAdd }) {
 
           <form onSubmit={handleSubmit}>
             <div className="modal-body">
+
               <input
                 type="text"
                 className="form-control mb-2"
@@ -101,39 +149,23 @@ export default function AddWishlistModal({ onClose, onAdd }) {
               >
                 <option value="">Selecciona tipo de producto</option>
                 <option value="perfume">Perfume</option>
-                <option value="makeup">Maquillaje</option>
+                <option value="makeup">Makeup</option>
               </select>
-
-              {itemType === 'makeup' && (
-                <>
-                  <input
-                    type="text"
-                    className="form-control mb-2"
-                    placeholder="Categoría"
-                    value={category}
-                    onChange={(e) => setCategory(e.target.value)}
-                  />
-                  <input
-                    type="text"
-                    className="form-control mb-3"
-                    placeholder="Subcategoría"
-                    value={subcategory}
-                    onChange={(e) => setSubcategory(e.target.value)}
-                  />
-                </>
-              )}
 
               {itemType === 'perfume' && (
                 <>
-                  <input
-                    type="text"
-                    className="form-control mb-3"
-                    placeholder="Tipo de perfume (EDP, EDT...)"
+                  <select
+                    className="form-control mb-2"
                     value={type}
                     onChange={(e) => setType(e.target.value)}
-                  />
+                    required
+                  >
+                    <option value="">Selecciona tipo de perfume</option>
+                    {perfumeTypes.map((t) => (
+                      <option key={t.value} value={t.value}>{t.label}</option>
+                    ))}
+                  </select>
 
-                  {/* Notes */}
                   <div className="mb-2">
                     <label className="form-label">Notas</label>
                     <div className="d-flex mb-2">
@@ -142,6 +174,7 @@ export default function AddWishlistModal({ onClose, onAdd }) {
                         className="form-control me-2"
                         value={noteInput}
                         onChange={(e) => setNoteInput(e.target.value)}
+                        list="notes-suggestions"
                         onKeyDown={(e) => {
                           if (e.key === 'Enter') {
                             e.preventDefault();
@@ -150,6 +183,9 @@ export default function AddWishlistModal({ onClose, onAdd }) {
                         }}
                       />
                       <button type="button" className="btn btn-sm btn-outline-primary" onClick={addNote}>+</button>
+                      <datalist id="notes-suggestions">
+                        {existingNotes.map((n) => <option key={n} value={n} />)}
+                      </datalist>
                     </div>
                     <div className="d-flex flex-wrap gap-2">
                       {notes.map((n) => (
@@ -158,7 +194,6 @@ export default function AddWishlistModal({ onClose, onAdd }) {
                     </div>
                   </div>
 
-                  {/* Main Accords */}
                   <div className="mb-2">
                     <label className="form-label">Main Accords</label>
                     <div className="d-flex mb-2">
@@ -167,6 +202,7 @@ export default function AddWishlistModal({ onClose, onAdd }) {
                         className="form-control me-2"
                         value={accordInput}
                         onChange={(e) => setAccordInput(e.target.value)}
+                        list="accords-suggestions"
                         onKeyDown={(e) => {
                           if (e.key === 'Enter') {
                             e.preventDefault();
@@ -175,6 +211,9 @@ export default function AddWishlistModal({ onClose, onAdd }) {
                         }}
                       />
                       <button type="button" className="btn btn-sm btn-outline-primary" onClick={addAccord}>+</button>
+                      <datalist id="accords-suggestions">
+                        {existingAccords.map((a) => <option key={a} value={a} />)}
+                      </datalist>
                     </div>
                     <div className="d-flex flex-wrap gap-2">
                       {mainAccords.map((a) => (
@@ -185,7 +224,27 @@ export default function AddWishlistModal({ onClose, onAdd }) {
                 </>
               )}
 
-              {/* Tags */}
+              {itemType === 'makeup' && (
+                <>
+                  <input
+                    type="text"
+                    className="form-control mb-2"
+                    placeholder="Categoría"
+                    value={category}
+                    onChange={(e) => setCategory(e.target.value)}
+                    required
+                  />
+                  <input
+                    type="text"
+                    className="form-control mb-2"
+                    placeholder="Subcategoría"
+                    value={subcategory}
+                    onChange={(e) => setSubcategory(e.target.value)}
+                    required
+                  />
+                </>
+              )}
+
               <div className="mb-2">
                 <label className="form-label">Tags</label>
                 <div className="d-flex mb-2">
@@ -194,6 +253,7 @@ export default function AddWishlistModal({ onClose, onAdd }) {
                     className="form-control me-2"
                     value={tagInput}
                     onChange={(e) => setTagInput(e.target.value)}
+                    list="tags-suggestions"
                     onKeyDown={(e) => {
                       if (e.key === 'Enter') {
                         e.preventDefault();
@@ -202,6 +262,9 @@ export default function AddWishlistModal({ onClose, onAdd }) {
                     }}
                   />
                   <button type="button" className="btn btn-sm btn-outline-primary" onClick={addTag}>+</button>
+                  <datalist id="tags-suggestions">
+                    {existingTags.map((t) => <option key={t} value={t} />)}
+                  </datalist>
                 </div>
                 <div className="d-flex flex-wrap gap-2">
                   {tags.map((t) => (
@@ -209,6 +272,7 @@ export default function AddWishlistModal({ onClose, onAdd }) {
                   ))}
                 </div>
               </div>
+
             </div>
 
             <div className="modal-footer">

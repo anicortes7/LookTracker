@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import Navbar from '../components/Navbar';
 import AddWishlistModal from '../components/AddWishlistModal';
+import WishlistCard from '../components/WishlistCard'; // Importamos el nuevo componente
 import { supabase } from '../lib/supabaseClient';
 
 export default function Wishlist({ wishlistItems }) {
@@ -14,37 +15,17 @@ export default function Wishlist({ wishlistItems }) {
 
       if (item.item_type === 'perfume') {
         insertTable = 'perfumes';
-        // Para perfumes: elimina id y item_type, conserva resto
-        const { id, item_type, size, notes, main_accords, tags, name, brand, type, is_decant } = item;
-        insertData = {
-          name,
-          brand,
-          type,
-          size,
-          notes,
-          main_accords,
-          tags,
-          is_decant,
-        };
+        const { id, item_type, ...rest } = item;
+        insertData = rest;
       } else if (item.item_type === 'makeup') {
         insertTable = 'makeup';
-        // Para makeup: elimina id y item_type, conserva resto
-        const { id, item_type, name, brand, category, subcategory, color, tono, tags } = item;
-        insertData = {
-          name,
-          brand,
-          category,
-          subcategory,
-          color,
-          tono,
-          tags,
-        };
+        const { id, item_type, ...rest } = item;
+        insertData = rest;
       } else {
         console.warn('Tipo de ítem desconocido:', item.item_type);
         return;
       }
 
-      // Insertar en la colección correspondiente
       const { data: inserted, error: insertError } = await supabase
         .from(insertTable)
         .insert([insertData]);
@@ -54,7 +35,6 @@ export default function Wishlist({ wishlistItems }) {
         return;
       }
 
-      // Si insert exitoso, eliminar de wishlist
       const { error: deleteError } = await supabase
         .from('wishlist')
         .delete()
@@ -65,7 +45,6 @@ export default function Wishlist({ wishlistItems }) {
         return;
       }
 
-      // Actualizar estado local
       setItems((prev) => prev.filter(i => i.id !== item.id));
       alert(`Ítem movido a ${insertTable} exitosamente.`);
     } catch (err) {
@@ -106,30 +85,7 @@ export default function Wishlist({ wishlistItems }) {
           ) : (
             items.map((item) => (
               <div className="col-12 col-sm-6 col-md-4 mb-4" key={item.id}>
-                <div className="card h-100">
-                  <div className="card-body d-flex flex-column">
-                    <h5 className="card-title">{item.name}</h5>
-                    <h6 className="card-subtitle mb-2 text-muted">{item.brand}</h6>
-                    <p className="card-text">
-                      Tipo: {item.item_type === 'perfume' ? item.type : item.category}<br />
-                      {item.size && <>Tamaño: {item.size}<br /></>}
-                      {item.color && <>Color: {item.color}<br /></>}
-                    </p>
-                    {item.tags && item.tags.length > 0 && (
-                      <div className="mb-2">
-                        {item.tags.map((tag) => (
-                          <span key={tag} className="badge bg-warning text-dark me-1">{tag}</span>
-                        ))}
-                      </div>
-                    )}
-                    <button
-                      className="btn btn-success mt-auto"
-                      onClick={() => handleMoveToCollection(item)}
-                    >
-                      Mover a colección
-                    </button>
-                  </div>
-                </div>
+                <WishlistCard item={item} onMove={handleMoveToCollection} />
               </div>
             ))
           )}
@@ -146,7 +102,6 @@ export default function Wishlist({ wishlistItems }) {
   );
 }
 
-// Fetch inicial desde Supabase
 export async function getServerSideProps() {
   const { data, error } = await supabase
     .from('wishlist')

@@ -21,6 +21,8 @@
   --color-verde-medio: #9DC296;
   --color-verde-oscuro: #324E2C;
   --color-casi-negro: #111A0F;
+  --color-perfume: #E3E9DB;
+  --color-maquillaje: #F7D7D7;
 }
 
 /* Estilos base */
@@ -258,10 +260,12 @@ select.form-control {
   font-family: 'TAN Pearl', serif;
   font-size: 1rem;
 }
-.perfume-card.decant-bg {
-  background-color: #f0e6ff; /* ejemplo color suave lila */
+.bg-light{
+  background-color: var(--color-perfume);
 }
-
+.bg-lightpink{
+  background-color:var(--color-maquillaje) ;
+}
 .type-tag {
   position: absolute;
   top: 10px;
