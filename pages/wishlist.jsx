@@ -4,20 +4,73 @@ import AddWishlistModal from '../components/AddWishlistModal';
 import { supabase } from '../lib/supabaseClient';
 
 export default function Wishlist({ wishlistItems }) {
-  // Normalizamos para que tags, notes, main_accords no sean null
-  const normalizedItems = wishlistItems.map(item => ({
-    ...item,
-    tags: item.tags ?? [],
-    notes: item.notes ?? [],
-    main_accords: item.main_accords ?? [],
-  }));
-
-  const [items, setItems] = useState(normalizedItems);
+  const [items, setItems] = useState(wishlistItems);
   const [showModal, setShowModal] = useState(false);
 
   const handleMoveToCollection = async (item) => {
-    console.log('Mover a colección:', item);
-    // Implementar luego
+    try {
+      let insertTable = '';
+      let insertData = {};
+
+      if (item.item_type === 'perfume') {
+        insertTable = 'perfumes';
+        // Para perfumes: elimina id y item_type, conserva resto
+        const { id, item_type, size, notes, main_accords, tags, name, brand, type, is_decant } = item;
+        insertData = {
+          name,
+          brand,
+          type,
+          size,
+          notes,
+          main_accords,
+          tags,
+          is_decant,
+        };
+      } else if (item.item_type === 'makeup') {
+        insertTable = 'makeup';
+        // Para makeup: elimina id y item_type, conserva resto
+        const { id, item_type, name, brand, category, subcategory, color, tono, tags } = item;
+        insertData = {
+          name,
+          brand,
+          category,
+          subcategory,
+          color,
+          tono,
+          tags,
+        };
+      } else {
+        console.warn('Tipo de ítem desconocido:', item.item_type);
+        return;
+      }
+
+      // Insertar en la colección correspondiente
+      const { data: inserted, error: insertError } = await supabase
+        .from(insertTable)
+        .insert([insertData]);
+
+      if (insertError) {
+        console.error('Error al mover a colección:', insertError);
+        return;
+      }
+
+      // Si insert exitoso, eliminar de wishlist
+      const { error: deleteError } = await supabase
+        .from('wishlist')
+        .delete()
+        .eq('id', item.id);
+
+      if (deleteError) {
+        console.error('Error al eliminar de wishlist:', deleteError);
+        return;
+      }
+
+      // Actualizar estado local
+      setItems((prev) => prev.filter(i => i.id !== item.id));
+      alert(`Ítem movido a ${insertTable} exitosamente.`);
+    } catch (err) {
+      console.error('Error inesperado:', err);
+    }
   };
 
   const handleAddToWishlist = async (newItem) => {
@@ -30,15 +83,7 @@ export default function Wishlist({ wishlistItems }) {
       return;
     }
 
-    // Normalizamos también el nuevo item
-    const added = {
-      ...data[0],
-      tags: data[0].tags ?? [],
-      notes: data[0].notes ?? [],
-      main_accords: data[0].main_accords ?? [],
-    };
-
-    setItems((prev) => [...prev, added]);
+    setItems((prev) => [...prev, data[0]]);
   };
 
   return (
@@ -70,9 +115,9 @@ export default function Wishlist({ wishlistItems }) {
                       {item.size && <>Tamaño: {item.size}<br /></>}
                       {item.color && <>Color: {item.color}<br /></>}
                     </p>
-                    {(item.tags ?? []).length > 0 && (
+                    {item.tags && item.tags.length > 0 && (
                       <div className="mb-2">
-                        {(item.tags ?? []).map((tag) => (
+                        {item.tags.map((tag) => (
                           <span key={tag} className="badge bg-warning text-dark me-1">{tag}</span>
                         ))}
                       </div>
@@ -101,6 +146,7 @@ export default function Wishlist({ wishlistItems }) {
   );
 }
 
+// Fetch inicial desde Supabase
 export async function getServerSideProps() {
   const { data, error } = await supabase
     .from('wishlist')
@@ -111,17 +157,9 @@ export async function getServerSideProps() {
     return { props: { wishlistItems: [] } };
   }
 
-  // Normalizo para evitar null en frontend
-  const wishlistItems = (data ?? []).map(item => ({
-    ...item,
-    tags: item.tags ?? [],
-    notes: item.notes ?? [],
-    main_accords: item.main_accords ?? [],
-  }));
-
   return {
     props: {
-      wishlistItems,
+      wishlistItems: data || [],
     },
   };
 }
