@@ -59,7 +59,7 @@ export default function AddPerfumeModal({ onClose, onAdd, existingNotes = [], ex
       type,
       size,
       notes,
-      main_accords: mainAccords,
+      ["main accords"]: mainAccords,
       tags,
       is_decant: isDecant,
     });
