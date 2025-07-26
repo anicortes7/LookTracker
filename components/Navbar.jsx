@@ -23,13 +23,16 @@ const Navbar = () => {
 
         <div className="collapse navbar-collapse" id="navbarNav">
           <ul className="navbar-nav ms-auto">
-            {['Inicio', 'Makeup', 'Perfumes', 'Wishlist', 'Looks'].map((tab) => (
-              <li className="nav-item" key={tab}>
-                <Link href={`/${tab.toLowerCase()}`} legacyBehavior>
-                  <a className="nav-link">{tab}</a>
-                </Link>
-              </li>
-            ))}
+            {['Inicio', 'Makeup', 'Perfumes', 'Wishlist', 'Looks'].map((tab) => {
+              const path = tab === 'Inicio' ? '/' : `/${tab.toLowerCase()}`;
+              return (
+                <li className="nav-item" key={tab}>
+                  <Link href={path} legacyBehavior>
+                    <a className="nav-link">{tab}</a>
+                  </Link>
+                </li>
+              );
+            })}
           </ul>
         </div>
       </div>
