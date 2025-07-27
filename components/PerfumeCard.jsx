@@ -19,9 +19,9 @@ const PerfumeCard = ({
   const typeLabels = {
     parfum: 'Parfum',
     extrait: 'Extrait de Parfum',
-    edp: 'Eau de Parfum (EDP)',
-    edt: 'Eau de Toilette (EDT)',
-    edc: 'Eau de Cologne (EDC)',
+    edp: 'EDP',
+    edt: 'EDT',
+    edc: 'EDC',
     'body mist': 'Body Mist',
   };
   const displayType = typeLabels[type] || type;
