@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import DeleteButton from './DeleteButton';
 
 const PerfumeCard = ({
   name,
@@ -57,7 +58,7 @@ const PerfumeCard = ({
           </div>
         )}
       </div>
-
+  <DeleteButton onClick={() => handleDeletePerfume(id)} />
       <button
         className="favorite-btn"
         aria-label={favorito ? 'Quitar de favoritos' : 'Agregar a favoritos'}
