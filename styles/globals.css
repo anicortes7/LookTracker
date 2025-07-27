@@ -1,7 +1,7 @@
 /* Fuentes */
 @font-face {
-  font-family: 'TanGrandeur';
-  src: url('/fonts/tangrandeur.woff2') format('woff2');
+  font-family: 'Dreamy';
+  src: url('/fonts/dreamyromantic.woff2') format('woff2');
   font-weight: normal;
   font-style: normal;
 }
@@ -12,6 +12,13 @@
   font-weight: normal;
   font-style: normal;
 }
+@font-face {
+  font-family: 'Babel';
+  src: url('/fonts/babelsans.woff2') format('woff2');
+  font-weight: normal;
+  font-style: normal;
+}
+
 
 :root {
   --color-fondo-base: #F7F1EB;
@@ -21,21 +28,23 @@
   --color-verde-medio: #9DC296;
   --color-verde-oscuro: #324E2C;
   --color-casi-negro: #111A0F;
-  --color-perfume: #E3E9DB;
+  --color-perfume: #EFBFA9;
   --color-maquillaje: #F7D7D7;
+  --color-rosa-oscuro: #C1737F;
 }
 
 /* Estilos base */
 body {
-  font-family: Helvetica, Arial, sans-serif;
+  font-family: 'Times New Roman', Times, serif;
   background-color: var(--color-fondo-base);
   color: var(--color-casi-negro);
   margin: 0;
   padding: 0;
+  font-weight: 500;
 }
 
 h1, h2, h3, h4, h5, h6 {
-  font-family: 'TAN Pearl', serif;
+  font-family: 'Dreamy', serif;
   margin: 0;
   padding: 0;
 }
@@ -46,9 +55,9 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 .navbar-brand {
-  font-family: 'TanGrandeur', serif;
+  font-family: 'TAN Pearl', serif;
   color: var(--color-rosado-suave);
-  font-size: 1.8rem;
+  font-size: 2.3rem;
 }
 .navbar-brand:hover {
   color: var(--color-verde-medio);
@@ -131,7 +140,11 @@ h1, h2, h3, h4, h5, h6 {
 .product-image {
   object-fit: cover;
 }
-
+.btn{
+  font-family: 'Babel';
+  font-size: 1.2rem;
+  padding: 1;
+}
 /* Botón favorito en esquina inferior derecha */
 .favorite-btn {
   position: absolute;
@@ -260,8 +273,8 @@ select.form-control {
   font-family: 'TAN Pearl', serif;
   font-size: 1rem;
 }
-.bg-light{
-  background-color: var(--color-perfume);
+.bg-lightpeach{
+  background-color: var(--color-peach-claro);
 }
 .bg-lightpink{
   background-color:var(--color-maquillaje) ;
@@ -277,5 +290,36 @@ select.form-control {
   font-size: 0.8rem;
   font-weight: 600;
   text-transform: uppercase;
+}
+.bg-perfume {
+  background-color: var(--color-peach-claro);
+}
+
+.bg-maquillaje {
+  background-color: var(--color-maquillaje);
+}
+
+.btn-perfume {
+  background-color: var(--color-perfume);
+  color: var(--color-fondo-base);
+  border-color: #D68C5E;
+}
+
+.btn-perfume:hover {
+  background-color:#E38C64;
+  border-color: #E38C64;
+  color: var(--color-fondo-base);
+}
+
+.btn-makeup {
+  background-color: var(--color-rosado-suave);
+  color: var(--color-fondo-base);
+  border-color: var(--color-rosa-oscuro);
+}
+
+.btn-makeup:hover {
+  background-color: #E17A89;
+  color: var(--color-fondo-base);
+  border-color: var(--color-rosa-oscuro);
 }
 

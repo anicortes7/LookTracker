@@ -1,16 +1,30 @@
 export default function WishlistCard({ item, onMove }) {
   const isPerfume = item.item_type === 'perfume';
 
-  const cardBgClass = isPerfume ? 'bg-light' : 'bg-lightpink';
+  const cardBgClass = isPerfume ? 'bg-perfume' : 'bg-maquillaje';
+  const buttonClass = isPerfume ? 'btn-perfume' : 'btn-makeup';
+
+  // Mapeo para mostrar el tipo con su label legible
+  const perfumeTypeLabels = {
+    edp: 'Eau de Parfum',
+    edt: 'Eau de Toilette',
+    extrait: 'Extrait',
+    oil: 'Perfume Oil',
+    mist: 'Body Mist',
+  };
+
+  const displayType = isPerfume
+    ? perfumeTypeLabels[item.type] || item.type
+    : item.category;
 
   return (
     <div className={`card h-100 ${cardBgClass}`}>
       <div className="card-body d-flex flex-column">
-        <h5 className="card-title">{item.name}</h5>
-        <h6 className="card-subtitle mb-2 text-muted">{item.brand}</h6>
+        <h3 className="card-title py-2">{item.name}</h3>
+        <h6 className="card-subtitle pt-1 mb-2 text-muted">{item.brand}</h6>
         <p className="card-text">
-          Tipo: {isPerfume ? item.type : item.category}<br />
-          {item.size && <>Tamaño: {item.size}<br /></>}
+          {displayType}<br />
+          {item.subcategory && <>{item.subcategory}<br /></>}
           {item.color && <>Color: {item.color}<br /></>}
         </p>
         {item.tags && item.tags.length > 0 && (
@@ -21,7 +35,7 @@ export default function WishlistCard({ item, onMove }) {
           </div>
         )}
         <button
-          className="btn btn-success mt-auto"
+          className={`btn mt-auto ${buttonClass}`}
           onClick={() => onMove(item)}
         >
           Mover a colección

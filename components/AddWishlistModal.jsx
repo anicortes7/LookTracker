@@ -29,6 +29,13 @@ export default function AddWishlistModal({ onClose, onAdd, existingNotes = [], e
     { label: 'Body Mist', value: 'body mist' },
   ];
 
+  // Subcategorías para maquillaje, igual que en AddProductModal
+  const subcategoryOptions = {
+    Face: ['Base', 'Corrector', 'Rubor', 'Highlight', 'Spray'],
+    Eyes: ['Sombra', 'Paleta', 'Delineador', 'Rimmel', 'Pigmento'],
+    Lips: ['Labial', 'Gloss', 'Tint', 'Liner'],
+  };
+
   const addNote = () => {
     const trimmed = noteInput.trim();
     if (trimmed && !notes.includes(trimmed)) {
@@ -53,6 +60,7 @@ export default function AddWishlistModal({ onClose, onAdd, existingNotes = [], e
     setTagInput('');
   };
 
+  // Cuando cambia itemType, limpiamos campos específicos
   useEffect(() => {
     setType('');
     setNotes([]);
@@ -63,6 +71,11 @@ export default function AddWishlistModal({ onClose, onAdd, existingNotes = [], e
     setCategory('');
     setSubcategory('');
   }, [itemType]);
+
+  // Cuando cambia categoría maquillaje, limpiamos subcategoría
+  useEffect(() => {
+    setSubcategory('');
+  }, [category]);
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -226,22 +239,31 @@ export default function AddWishlistModal({ onClose, onAdd, existingNotes = [], e
 
               {itemType === 'makeup' && (
                 <>
-                  <input
-                    type="text"
+                  <select
                     className="form-control mb-2"
-                    placeholder="Categoría"
                     value={category}
                     onChange={(e) => setCategory(e.target.value)}
                     required
-                  />
-                  <input
-                    type="text"
-                    className="form-control mb-2"
-                    placeholder="Subcategoría"
-                    value={subcategory}
-                    onChange={(e) => setSubcategory(e.target.value)}
-                    required
-                  />
+                  >
+                    <option value="">Selecciona categoría</option>
+                    <option value="Face">Face</option>
+                    <option value="Eyes">Eyes</option>
+                    <option value="Lips">Lips</option>
+                  </select>
+
+                  {category && (
+                    <select
+                      className="form-control mb-2"
+                      value={subcategory}
+                      onChange={(e) => setSubcategory(e.target.value)}
+                      required
+                    >
+                      <option value="">Selecciona subcategoría</option>
+                      {subcategoryOptions[category].map((option) => (
+                        <option key={option} value={option}>{option}</option>
+                      ))}
+                    </select>
+                  )}
                 </>
               )}
 
