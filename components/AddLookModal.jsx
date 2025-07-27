@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import Select from 'react-select';
 import { supabase } from '../lib/supabaseClient';
 
 export default function AddLookModal({ onClose, onAdd }) {
@@ -22,12 +23,26 @@ export default function AddLookModal({ onClose, onAdd }) {
 
   const fetchPerfumes = async () => {
     const { data, error } = await supabase.from('perfumes').select('id, name, brand');
-    if (!error) setPerfumeOptions(data);
+    if (!error) {
+      const formatted = data.map(p => ({
+        value: p.id,
+        label: `${p.name} - ${p.brand}`,
+        raw: p
+      }));
+      setPerfumeOptions(formatted);
+    }
   };
 
   const fetchMakeup = async () => {
     const { data, error } = await supabase.from('makeup').select('id, name, category, subcategory');
-    if (!error) setMakeupOptions(data);
+    if (!error) {
+      const formatted = data.map(m => ({
+        value: m.id,
+        label: `${m.name} (${m.category}/${m.subcategory})`,
+        raw: m
+      }));
+      setMakeupOptions(formatted);
+    }
   };
 
   const fetchTags = async () => {
@@ -53,8 +68,8 @@ export default function AddLookModal({ onClose, onAdd }) {
       name,
       date,
       tags,
-      perfumes: selectedPerfumes,
-      makeup_items: selectedMakeup,
+      perfumes: selectedPerfumes.map(p => p.raw),
+      makeup_items: selectedMakeup.map(m => m.raw),
     };
 
     onAdd(look);
@@ -92,45 +107,23 @@ export default function AddLookModal({ onClose, onAdd }) {
 
               {/* Perfumes */}
               <label className="form-label fw-bold">Perfumes</label>
-              <select
-                multiple
-                className="form-select mb-3"
-                value={selectedPerfumes.map(p => p.id)}
-                onChange={(e) => {
-                  const selected = [...e.target.selectedOptions].map((opt) => {
-                    const found = perfumeOptions.find((p) => p.id === parseInt(opt.value));
-                    return found || null;
-                  }).filter(Boolean);
-                  setSelectedPerfumes(selected);
-                }}
-              >
-                {perfumeOptions.map((p) => (
-                  <option key={p.id} value={p.id}>
-                    {p.name} - {p.brand}
-                  </option>
-                ))}
-              </select>
+              <Select
+                isMulti
+                options={perfumeOptions}
+                value={selectedPerfumes}
+                onChange={setSelectedPerfumes}
+                className="mb-3"
+              />
 
               {/* Makeup */}
               <label className="form-label fw-bold">Makeup</label>
-              <select
-                multiple
-                className="form-select mb-3"
-                value={selectedMakeup.map(m => m.id)}
-                onChange={(e) => {
-                  const selected = [...e.target.selectedOptions].map((opt) => {
-                    const found = makeupOptions.find((m) => m.id === parseInt(opt.value));
-                    return found || null;
-                  }).filter(Boolean);
-                  setSelectedMakeup(selected);
-                }}
-              >
-                {makeupOptions.map((m) => (
-                  <option key={m.id} value={m.id}>
-                    {m.name} ({m.category}/{m.subcategory})
-                  </option>
-                ))}
-              </select>
+              <Select
+                isMulti
+                options={makeupOptions}
+                value={selectedMakeup}
+                onChange={setSelectedMakeup}
+                className="mb-3"
+              />
 
               {/* Tags */}
               <label className="form-label">Tags</label>
