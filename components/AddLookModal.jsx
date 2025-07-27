@@ -1,12 +1,13 @@
 import { useState, useEffect } from 'react';
-import Select from 'react-select';
 import { supabase } from '../lib/supabaseClient';
+import SelectInput from './SelectInput';  // Cambio aquí
+import TagInput from './TagInput';
+import styles from '../styles/FormInputs.module.css';
 
 export default function AddLookModal({ onClose, onAdd }) {
   const [name, setName] = useState('');
   const [date, setDate] = useState('');
   const [tags, setTags] = useState([]);
-  const [tagInput, setTagInput] = useState('');
   const [existingTags, setExistingTags] = useState([]);
 
   const [perfumeOptions, setPerfumeOptions] = useState([]);
@@ -24,11 +25,7 @@ export default function AddLookModal({ onClose, onAdd }) {
   const fetchPerfumes = async () => {
     const { data, error } = await supabase.from('perfumes').select('id, name, brand');
     if (!error) {
-      const formatted = data.map(p => ({
-        value: p.id,
-        label: `${p.name} - ${p.brand}`,
-        raw: p
-      }));
+      const formatted = data.map((p) => ({ value: p.id, label: `${p.name} - ${p.brand}` }));
       setPerfumeOptions(formatted);
     }
   };
@@ -36,10 +33,9 @@ export default function AddLookModal({ onClose, onAdd }) {
   const fetchMakeup = async () => {
     const { data, error } = await supabase.from('makeup').select('id, name, category, subcategory');
     if (!error) {
-      const formatted = data.map(m => ({
+      const formatted = data.map((m) => ({
         value: m.id,
         label: `${m.name} (${m.category}/${m.subcategory})`,
-        raw: m
       }));
       setMakeupOptions(formatted);
     }
@@ -48,17 +44,9 @@ export default function AddLookModal({ onClose, onAdd }) {
   const fetchTags = async () => {
     const { data, error } = await supabase.from('looks').select('tags');
     if (!error) {
-      const all = data.flatMap(item => item.tags || []);
+      const all = data.flatMap((item) => item.tags || []);
       setExistingTags([...new Set(all)]);
     }
-  };
-
-  const addTag = () => {
-    const trimmed = tagInput.trim();
-    if (trimmed && !tags.includes(trimmed)) {
-      setTags([...tags, trimmed]);
-    }
-    setTagInput('');
   };
 
   const handleSubmit = (e) => {
@@ -68,15 +56,20 @@ export default function AddLookModal({ onClose, onAdd }) {
       name,
       date,
       tags,
-      perfumes: selectedPerfumes.map(p => p.raw),
-      makeup_items: selectedMakeup.map(m => m.raw),
+      perfumes: selectedPerfumes.map((p) => ({ id: p.value, name: p.label })),
+      makeup_items: selectedMakeup.map((m) => ({ id: m.value, name: m.label })),
     };
 
     onAdd(look);
   };
 
   return (
-    <div className="modal show d-block" tabIndex="-1" role="dialog" style={{ backgroundColor: 'rgba(0,0,0,0.5)' }}>
+    <div
+      className="modal show d-block"
+      tabIndex="-1"
+      role="dialog"
+      style={{ backgroundColor: 'rgba(0,0,0,0.5)' }}
+    >
       <div className="modal-dialog modal-lg" role="document">
         <div className="modal-content">
           <div className="modal-header position-relative">
@@ -90,7 +83,7 @@ export default function AddLookModal({ onClose, onAdd }) {
             <div className="modal-body">
               <input
                 type="text"
-                className="form-control mb-2"
+                className={`form-control mb-2 ${styles.inputGreen}`}
                 placeholder="Nombre del look"
                 value={name}
                 onChange={(e) => setName(e.target.value)}
@@ -99,61 +92,31 @@ export default function AddLookModal({ onClose, onAdd }) {
 
               <input
                 type="date"
-                className="form-control mb-3"
+                className={`form-control mb-2 ${styles.inputGreen}`}
                 value={date}
                 onChange={(e) => setDate(e.target.value)}
                 required
               />
 
-              {/* Perfumes */}
-              <label className="form-label fw-bold">Perfumes</label>
-              <Select
-                isMulti
+              <SelectInput
+                label="Perfumes"
                 options={perfumeOptions}
                 value={selectedPerfumes}
                 onChange={setSelectedPerfumes}
                 className="mb-3"
+                isMulti
               />
 
-              {/* Makeup */}
-              <label className="form-label fw-bold">Makeup</label>
-              <Select
-                isMulti
+              <SelectInput
+                label="Makeup"
                 options={makeupOptions}
                 value={selectedMakeup}
                 onChange={setSelectedMakeup}
                 className="mb-3"
+                isMulti
               />
 
-              {/* Tags */}
-              <label className="form-label">Tags</label>
-              <div className="d-flex mb-2">
-                <input
-                  type="text"
-                  className="form-control me-2"
-                  value={tagInput}
-                  onChange={(e) => setTagInput(e.target.value)}
-                  list="tags-suggestions"
-                  onKeyDown={(e) => {
-                    if (e.key === 'Enter') {
-                      e.preventDefault();
-                      addTag();
-                    }
-                  }}
-                />
-                <button type="button" className="btn btn-sm btn-outline-primary" onClick={addTag}>+</button>
-                <datalist id="tags-suggestions">
-                  {existingTags.map((t) => (
-                    <option key={t} value={t} />
-                  ))}
-                </datalist>
-              </div>
-
-              <div className="d-flex flex-wrap gap-2">
-                {tags.map((t) => (
-                  <span key={t} className="badge bg-warning text-dark">{t}</span>
-                ))}
-              </div>
+              <TagInput tags={tags} setTags={setTags} existingTags={existingTags} />
             </div>
 
             <div className="modal-footer">

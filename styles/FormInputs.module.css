@@ -1,0 +1,5 @@
+/* styles/FormInputs.module.css */
+.inputGreen:focus {
+  border-color: #9DC296 !important;
+  box-shadow: 0 0 0 0.2rem rgba(157, 194, 150, 0.25);
+}

@@ -38,18 +38,20 @@ export default function Perfumes({ perfumes }) {
           {perfumes.length === 0 ? (
             <p>No hay perfumes cargados todavía.</p>
           ) : (
-            perfumes.map(({ id, name, brand, type, size, notes, main_accords }) => (
-              <div className="col-12 col-sm-6 col-md-4 mb-4" key={id}>
-                <ProductCard
-                  name={name}
-                  brand={brand}
-                  category={type}
-                  subcategory={size}
-                  notes={notes}
-                  mainAccords={main_accords}
-                />
-              </div>
-            ))
+perfumes.map(({ id, name, brand, type, size, notes, main_accords, is_decant }) => (
+  <div className="col-12 col-sm-6 col-md-4 mb-4" key={id}>
+    <ProductCard
+      name={name}
+      brand={brand}
+      type={type}
+      size={size}
+      notes={notes}
+      mainAccords={main_accords}
+      isDecant={is_decant} // 👈 esto es lo que faltaba
+    />
+  </div>
+))
+
           )}
         </div>
 
